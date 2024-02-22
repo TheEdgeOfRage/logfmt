@@ -1,0 +1,22 @@
+---
+linters:
+  enable:
+    - goimports
+    - stylecheck
+    - lll
+    - errcheck
+
+run:
+  go: '1.22'
+  timeout: 30s
+
+issues:
+  exclude-rules:
+    - linters:
+        - lll
+      source: "// nolint:lll"
+    - linters:
+        - unused
+        - deadcode
+        - varcheck
+      source: "// nolint:unused"
