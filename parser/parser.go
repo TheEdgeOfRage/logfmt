@@ -37,7 +37,7 @@ func (p *Parser) Start() error {
 			continue
 		}
 
-		_, err = fmt.Fprintf(p.output, "%s\n", record.String(p.cfg.OutputFields, p.cfg.Color))
+		_, err = fmt.Fprintf(p.output, "%s\n", record.String(p.cfg.OutputFields))
 		if err != nil {
 			return fmt.Errorf("failed to print log to output: %w", err)
 		}

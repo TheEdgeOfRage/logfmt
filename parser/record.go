@@ -86,28 +86,21 @@ func isNull(s string) bool {
 	return s == "null" || s == "NULL" || s == "nil" || s == "<nil>" || s == "None"
 }
 
-func getFormattedValue(value string, colorize bool) string {
-	if strings.Contains(value, " ") {
-		value = fmt.Sprintf(`"%s"`, value)
-	}
-	if !colorize {
-		return value
-	}
+func getFormattedValue(value string) string {
 	if isNumeric(value) || isBoolean(value) {
 		return color.MagentaString(value)
 	}
 	if isNull(value) {
 		return color.YellowString(value)
 	}
+	if strings.Contains(value, " ") {
+		value = fmt.Sprintf(`"%s"`, value)
+	}
 	return color.HiGreenString(value)
 }
 
-func getFormattedLevel(level int, colorize bool) string {
-	levelString := levelStrings[level]
-	if !colorize {
-		return levelString
-	}
-	return levelColors[level].Sprintf("[%s]", levelString)
+func getFormattedLevel(level int) string {
+	return levelColors[level].Sprintf("[%s]", levelStrings[level])
 }
 
 func (r *Record) parseLevel(level string) {
@@ -146,25 +139,21 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 	return true
 }
 
-// String returns a formatted and optionally colorized string representation of the Record
-func (r *Record) String(outputFields []string, colorize bool) string {
+// String returns a formatted string representation of the Record
+func (r *Record) String(outputFields []string) string {
 	line := ""
 	for _, key := range r.fieldOrder {
 		if len(outputFields) > 0 && !slices.Contains(outputFields, key) {
 			continue
 		}
 		value := r.fields[key]
-		if colorize {
-			key = color.HiBlueString(key)
-		}
-		line += fmt.Sprintf("%s=%s ", key, getFormattedValue(value, colorize))
+		key = color.HiBlueString(key)
+		line += fmt.Sprintf("%s=%s ", key, getFormattedValue(value))
 	}
-	var fmtString string
-	if colorize {
-		fmtString = "%s %26s %s"
-	} else {
-		fmtString = "%s %s %s"
+	fmtString := "%s %26s %s"
+	if color.NoColor {
+		fmtString = "%s %7s %s"
 	}
 
-	return fmt.Sprintf(fmtString, r.time.Format("2006-01-02 15:04:05"), getFormattedLevel(r.level, colorize), line)
+	return fmt.Sprintf(fmtString, r.time.Format("2006-01-02 15:04:05"), getFormattedLevel(r.level), line)
 }

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	flags "github.com/jessevdk/go-flags"
+	"github.com/fatih/color"
+	"github.com/jessevdk/go-flags"
 )
 
 const (
@@ -22,8 +23,6 @@ type Config struct {
 	OutputFields []string
 	// Filter is a map of fields and values which are used to filter the log output
 	Filter map[string]string
-	// Color is a flag to enable or disable color on the output
-	Color bool
 }
 
 type rawConfig struct {
@@ -31,6 +30,7 @@ type rawConfig struct {
 	OutputFields string `long:"output" short:"o" description:"Output field selector (comma separated)"`
 	Filter       string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
 	NoColor      bool   `long:"no-color" short:"n" description:"Disable color output"`
+	ForceColor   bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
 }
 
 func Parse() (*Config, error) {
@@ -42,9 +42,7 @@ func Parse() (*Config, error) {
 		return nil, err
 	}
 
-	cfg := Config{
-		Color: !raw.NoColor,
-	}
+	cfg := Config{}
 	cfg.setOutputFields(raw.OutputFields)
 	err = cfg.setFilter(raw.Filter)
 	if err != nil {
@@ -53,6 +51,15 @@ func Parse() (*Config, error) {
 	err = cfg.setLevel(raw.LogLevel)
 	if err != nil {
 		return nil, err
+	}
+	if raw.ForceColor && raw.NoColor {
+		return nil, fmt.Errorf("cannot use both --force-color and --no-color")
+	}
+	if raw.ForceColor {
+		color.NoColor = false
+	}
+	if raw.NoColor {
+		color.NoColor = true
 	}
 
 	return &cfg, nil

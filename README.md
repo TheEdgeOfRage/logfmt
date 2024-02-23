@@ -32,16 +32,17 @@ go install github.com/TheEdgeOfRage/logfmt
 
 ```
 Usage:
-  logfmt [OPTIONS]
+  main [OPTIONS]
 
 Application Options:
-  -l, --level=    Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
-  -o, --output=   Output field selector (comma separated)
-  -f, --filter=   Filter fields (key=value comma separated)
-  -n, --no-color  Disable color output
+  -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
+  -o, --output=      Output field selector (comma separated)
+  -f, --filter=      Filter fields (key=value comma separated)
+  -n, --no-color     Disable color output
+  -c, --force-color  Force color output, even when outputting to a pipe
 
 Help Options:
-  -h, --help      Show this help message
+  -h, --help         Show this help message
 ```
 
 If installed in your PATH, you can just run the `logfmt` program without any arguments and it will start reading log
@@ -49,6 +50,13 @@ lines from stdin and write the formatted lines to stdout.
 
 This CLI follows the UNIX philosophy, so it will only read from stdin and write to stdout. If you want stderr or a different
 file, use your shell's built-in directives for that.
+
+A typical usecase would be running a service for local development, or fetching the logs from a Kubernetes pod:
+
+```
+go run yourservice.go | logfmt
+kubectl logs -n namespace pod | logfmt
+```
 
 #### Level filtering
 
@@ -69,4 +77,9 @@ numerical filtering might come in the future.
 
 #### No color
 
-If you don't want to have colors on the output, use `-n`.
+If you don't want to have colors on the output, set `-n`.
+
+#### Force color
+
+By default, logfmt will detect if the output is a pipe or redirect to a file and will automatically disable colors. If
+you still want to have colorized output, for example when piping into `less`, you can force it using `-c`.
