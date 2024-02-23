@@ -1,6 +1,6 @@
 # logfmt CLI
 
-This is a (very) simple logfmt CLI tool to make reading logfmt logs on your terminal easier.
+This is a (very) simple CLI tool to make reading and parsing logfmt logs from your terminal easier.
 It supports colorized output, output field selection, and log level and key value filtering.
 
 ## What is logfmt?
@@ -32,11 +32,12 @@ go install github.com/TheEdgeOfRage/logfmt
 
 ```
 Usage:
-  main [OPTIONS]
+  logfmt [OPTIONS]
 
 Application Options:
   -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
   -o, --output=      Output field selector (comma separated)
+  -e, --exclude=     Exclude field selector (comma separated)
   -f, --filter=      Filter fields (key=value comma separated)
   -n, --no-color     Disable color output
   -c, --force-color  Force color output, even when outputting to a pipe
@@ -68,6 +69,12 @@ show up.
 
 You can pass in a comma separated list of fields to the `-o` flag that you want it to print to the output. The timestamp
 and level are always printed, so this only applies to additional fields.
+
+#### Excluding fields
+
+If you want to exclude some fields from the output, you can pass in a comma separated list of fields to the `-e` flag.
+This can be useful in cases where you don't know what fields are going to be present in the logs, but want to exclude
+some verbose ones.
 
 #### Filtering by values
 

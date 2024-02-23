@@ -140,10 +140,13 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 }
 
 // String returns a formatted string representation of the Record
-func (r *Record) String(outputFields []string) string {
+func (r *Record) String(outputFields []string, excludeFields []string) string {
 	line := ""
 	for _, key := range r.fieldOrder {
 		if len(outputFields) > 0 && !slices.Contains(outputFields, key) {
+			continue
+		}
+		if len(excludeFields) > 0 && slices.Contains(excludeFields, key) {
 			continue
 		}
 		value := r.fields[key]

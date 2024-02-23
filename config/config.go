@@ -19,18 +19,21 @@ const (
 type Config struct {
 	// LogLevel is the level filter for the log output
 	LogLevel int
-	// LogFormat is a list of fields to include on the log output
+	// OutputFields is a list of fields to include on the log output
 	OutputFields []string
+	// ExcludeFields is a list of fields to exclude from the log output
+	ExcludeFields []string
 	// Filter is a map of fields and values which are used to filter the log output
 	Filter map[string]string
 }
 
 type rawConfig struct {
-	LogLevel     string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
-	OutputFields string `long:"output" short:"o" description:"Output field selector (comma separated)"`
-	Filter       string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
-	NoColor      bool   `long:"no-color" short:"n" description:"Disable color output"`
-	ForceColor   bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
+	LogLevel      string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
+	OutputFields  string `long:"output" short:"o" description:"Output field selector (comma separated)"`
+	ExcludeFields string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
+	Filter        string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
+	NoColor       bool   `long:"no-color" short:"n" description:"Disable color output"`
+	ForceColor    bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
 }
 
 func Parse() (*Config, error) {
@@ -42,8 +45,10 @@ func Parse() (*Config, error) {
 		return nil, err
 	}
 
-	cfg := Config{}
-	cfg.setOutputFields(raw.OutputFields)
+	cfg := Config{
+		OutputFields:  parseFieldList(raw.OutputFields),
+		ExcludeFields: parseFieldList(raw.ExcludeFields),
+	}
 	err = cfg.setFilter(raw.Filter)
 	if err != nil {
 		return nil, err
@@ -83,12 +88,12 @@ func (c *Config) setLevel(level string) error {
 	return nil
 }
 
-func (c *Config) setOutputFields(fields string) {
+func parseFieldList(fields string) []string {
 	fields = strings.Trim(fields, " ")
 	if fields == "" {
-		return
+		return nil
 	}
-	c.OutputFields = strings.Split(fields, ",")
+	return strings.Split(fields, ",")
 }
 
 func (c *Config) setFilter(filter string) error {
