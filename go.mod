@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/fatih/color v1.16.0
 	github.com/go-logfmt/logfmt v0.6.0
+	github.com/jessevdk/go-flags v1.5.0
 )
 
 require (
