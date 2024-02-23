@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-logfmt/logfmt"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -29,15 +28,16 @@ type Config struct {
 
 type rawConfig struct {
 	LogLevel     string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
-	OutputFields string `long:"output" short:"o" description:"Output field selector (space separated)"`
-	Filter       string `long:"filter" short:"f" description:"Filter fields (key=value space separated)"`
+	OutputFields string `long:"output" short:"o" description:"Output field selector (comma separated)"`
+	Filter       string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
 	NoColor      bool   `long:"no-color" short:"n" description:"Disable color output"`
 }
 
 func Parse() (*Config, error) {
 	var raw rawConfig
 
-	_, err := flags.Parse(&raw)
+	parser := flags.NewParser(&raw, flags.HelpFlag|flags.PassDoubleDash)
+	_, err := parser.Parse()
 	if err != nil {
 		return nil, err
 	}
@@ -78,21 +78,26 @@ func (c *Config) setLevel(level string) error {
 
 func (c *Config) setOutputFields(fields string) {
 	fields = strings.Trim(fields, " ")
-	c.OutputFields = strings.Split(fields, " ")
-	if len(c.OutputFields) == 1 && c.OutputFields[0] == "" {
-		c.OutputFields = nil
+	if fields == "" {
+		return
 	}
+	c.OutputFields = strings.Split(fields, ",")
 }
 
 func (c *Config) setFilter(filter string) error {
-	dec := logfmt.NewDecoder(strings.NewReader(filter))
+	if filter == "" {
+		return nil
+	}
+
+	filters := strings.Split(filter, ",")
 	c.Filter = make(map[string]string)
-	dec.ScanRecord()
-	for dec.ScanKeyval() {
-		if dec.Err() != nil {
-			return dec.Err()
+	for _, f := range filters {
+		f = strings.Trim(f, " ")
+		parts := strings.Split(f, "=")
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid filter: %s", f)
 		}
-		c.Filter[string(dec.Key())] = string(dec.Value())
+		c.Filter[parts[0]] = parts[1]
 	}
 	return nil
 }
