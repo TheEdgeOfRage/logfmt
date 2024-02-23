@@ -17,7 +17,7 @@ The goal of this tool is to make these logs more readable by applying some synta
 `timestamp` and `level` fields into static locations without their keys, filtering based on log level, picking specific
 output columns, and filtering based on specific key=value pairs (say you're looking only for a specific API call).
 
-![logfmt example](https://pyazo.com/7251cece-7759-43af-bb02-3298e1178faa.png)
+![logfmt example](https://pyazo.com/3fd63738-3d4f-45d8-b749-f3cfb8b32cee.png)
 
 ## How to
 
