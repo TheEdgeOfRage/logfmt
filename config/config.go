@@ -25,6 +25,8 @@ type Config struct {
 	ExcludeFields []string
 	// Filter is a map of fields and values which are used to filter the log output
 	Filter map[string]string
+	// NoTime disables the time output
+	NoTime bool
 }
 
 type rawConfig struct {
@@ -34,6 +36,7 @@ type rawConfig struct {
 	Filter        string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
 	NoColor       bool   `long:"no-color" short:"n" description:"Disable color output"`
 	ForceColor    bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
+	NoTime        bool   `long:"no-time" short:"t" description:"Disable time output"`
 }
 
 func Parse() (*Config, error) {
@@ -65,6 +68,9 @@ func Parse() (*Config, error) {
 	}
 	if raw.NoColor {
 		color.NoColor = true
+	}
+	if raw.NoTime {
+		cfg.NoTime = true
 	}
 
 	return &cfg, nil

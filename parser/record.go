@@ -140,23 +140,34 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 }
 
 // String returns a formatted string representation of the Record
-func (r *Record) String(outputFields []string, excludeFields []string) string {
+func (r *Record) String(cfg *config.Config) string {
 	line := ""
 	for _, key := range r.fieldOrder {
-		if len(outputFields) > 0 && !slices.Contains(outputFields, key) {
+		if len(cfg.OutputFields) > 0 && !slices.Contains(cfg.OutputFields, key) {
 			continue
 		}
-		if len(excludeFields) > 0 && slices.Contains(excludeFields, key) {
+		if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
 			continue
 		}
 		value := r.fields[key]
 		key = color.HiBlueString(key)
 		line += fmt.Sprintf("%s=%s ", key, getFormattedValue(value))
 	}
-	fmtString := "%s %26s %s"
-	if color.NoColor {
-		fmtString = "%s %7s %s"
+
+	var fmtString strings.Builder
+	if !cfg.NoTime {
+		fmtString.WriteString("%s ")
 	}
 
-	return fmt.Sprintf(fmtString, r.time.Format("2006-01-02 15:04:05"), getFormattedLevel(r.level), line)
+	if color.NoColor {
+		fmtString.WriteString("%7s %s")
+	} else {
+		fmtString.WriteString("%26s %s")
+	}
+
+	if cfg.NoTime {
+		return fmt.Sprintf(fmtString.String(), getFormattedLevel(r.level), line)
+	} else {
+		return fmt.Sprintf(fmtString.String(), r.time.Format("2006-01-02 15:04:05"), getFormattedLevel(r.level), line)
+	}
 }
