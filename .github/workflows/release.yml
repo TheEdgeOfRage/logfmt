@@ -31,26 +31,21 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v5
       with:
-        go-version: '1.23'
+        go-version-file: "go.mod"
 
     - name: Build
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
       run: |
-        go build -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}
+        go build -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
 
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
-        upload_url: ${{ needs.create_release.outputs.upload_url }}
-        asset_path: ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}
-        asset_name: logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
-        asset_content_type: application/octet-stream
+        files: ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
