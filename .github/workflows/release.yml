@@ -12,6 +12,8 @@ jobs:
       matrix:
         goos: [linux, darwin]
         goarch: [amd64, arm64]
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
