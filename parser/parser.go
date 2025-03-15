@@ -1,11 +1,13 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
-	"github.com/TheEdgeOfRage/logfmt/config"
 	"github.com/go-logfmt/logfmt"
+
+	"github.com/TheEdgeOfRage/logfmt/config"
 )
 
 type Parser struct {
@@ -43,5 +45,8 @@ func (p *Parser) Start() error {
 		}
 	}
 
-	return nil
+	if errors.Is(decoder.Err(), io.EOF) {
+		return nil
+	}
+	return decoder.Err()
 }
