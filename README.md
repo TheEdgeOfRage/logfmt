@@ -27,7 +27,7 @@ I recommend adding a `GOBIN` env var to your shell with a location to where you 
 and adding that location to your `PATH`. With that set up, you can install logfmt using:
 
 ```
-go install github.com/TheEdgeOfRage/logfmt
+go install github.com/TheEdgeOfRage/logfmt@latest
 ```
 
 ### Usage
