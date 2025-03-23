@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	levelStrings map[int]string
-	levelColors  map[int]*color.Color
+	levelStrings    map[int]string
+	levelColors     map[int]*color.Color
+	timestampLabels = []string{"time", "timestamp", "datetime", "ts"}
 )
 
 func init() {
@@ -58,7 +59,7 @@ func NewRecord(decoder *logfmt.Decoder) (*Record, error) {
 			record.parseLevel(value)
 			continue
 		}
-		if key == "time" || key == "timestamp" {
+		if slices.Contains(timestampLabels, key) {
 			err := record.parseTime(value)
 			if err != nil {
 				return nil, err
@@ -151,7 +152,7 @@ func (r *Record) String(cfg *config.Config) string {
 		}
 		value := r.fields[key]
 		key = color.HiBlueString(key)
-		line += fmt.Sprintf("%s=%s ", key, getFormattedValue(value))
+		line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
 	}
 
 	var fmtString strings.Builder
@@ -160,9 +161,9 @@ func (r *Record) String(cfg *config.Config) string {
 	}
 
 	if color.NoColor {
-		fmtString.WriteString("%7s %s")
+		fmtString.WriteString("%7s%s")
 	} else {
-		fmtString.WriteString("%26s %s")
+		fmtString.WriteString("%26s%s")
 	}
 
 	if cfg.NoTime {
