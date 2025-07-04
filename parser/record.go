@@ -15,7 +15,7 @@ import (
 var (
 	levelStrings    map[int]string
 	levelColors     map[int]*color.Color
-	timestampLabels = []string{"time", "timestamp", "datetime", "ts"}
+	timestampLabels = []string{"time", "timestamp", "datetime", "ts", "t"}
 )
 
 func init() {
