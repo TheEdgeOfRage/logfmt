@@ -21,8 +21,6 @@ type Config struct {
 	LogLevel int
 	// OutputFields is a list of fields to include on the log output
 	OutputFields []string
-	// OrderOutputFields is a list of fields to include on the log output in order
-	OrderOutputFields []string
 	// ExcludeFields is a list of fields to exclude from the log output
 	ExcludeFields []string
 	// Filter is a map of fields and values which are used to filter the log output
