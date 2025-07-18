@@ -107,7 +107,7 @@ Don't output keys just values (emulate lcut like behavior), also outputs timesta
 
 ### Output All
 
-Output all keys if option is set and treat option as an order which fileds schould be displayed first
+Output all keys if flag is set and treat output option as an order which fields should be displayed first
 
 ### Sponsors
 
