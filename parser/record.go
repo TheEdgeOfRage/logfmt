@@ -44,7 +44,7 @@ type Record struct {
 }
 
 // NewRecord parses a new Record from a logfmt.Decoder
-func NewRecord(decoder *logfmt.Decoder) (*Record, error) {
+func NewRecord(decoder *logfmt.Decoder, cfg *config.Config) (*Record, error) {
 	var record Record
 	record.fields = make(map[string]string)
 	record.fieldOrder = make([]string, 0)
@@ -57,14 +57,18 @@ func NewRecord(decoder *logfmt.Decoder) (*Record, error) {
 		key, value := string(decoder.Key()), string(decoder.Value())
 		if key == "level" {
 			record.parseLevel(value)
-			continue
+			if !cfg.Raw {
+				continue
+			}
 		}
 		if slices.Contains(timestampLabels, key) {
 			err := record.parseTime(value)
 			if err != nil {
 				return nil, err
 			}
-			continue
+			if !cfg.Raw {
+				continue
+			}
 		}
 		record.fields[key] = value
 		record.fieldOrder = append(record.fieldOrder, key)
@@ -149,6 +153,18 @@ func (r *Record) String(cfg *config.Config) string {
 	if len(cfg.OutputFields) > 0 {
 		outFields = cfg.OutputFields
 	}
+
+	if cfg.All && len(cfg.OutputFields) > 0 {
+		var reorderedFields []string = cfg.OutputFields
+
+		for _, key := range r.fieldOrder {
+			if slices.Contains(reorderedFields, key) {
+				reorderedFields = append(reorderedFields, key)
+			}
+		}
+		outFields = reorderedFields
+	}
+
 	for _, key := range outFields {
 		if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
 			continue
@@ -158,11 +174,19 @@ func (r *Record) String(cfg *config.Config) string {
 			continue
 		}
 		key := color.HiBlueString(key)
-		line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+		if cfg.Raw {
+			line += fmt.Sprintf(" %s", value)
+		} else {
+			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+		}
 	}
 
 	if line == "" && !cfg.KeepEmpty {
 		return ""
+	}
+
+	if cfg.Raw {
+		return strings.TrimSpace(line)
 	}
 
 	var fmtString strings.Builder
