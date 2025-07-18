@@ -70,7 +70,7 @@ show up.
 
 #### Output field selection
 
-You can pass in a comma separated list of fields to the `-o` or `-O` flag that you want it to print to the output. The timestamp
+You can pass in a comma separated list of fields to the `-o` flag that you want it to print to the output. The timestamp
 and level are always printed, so this only applies to additional fields.
 
 #### Excluding fields
