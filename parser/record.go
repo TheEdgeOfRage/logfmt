@@ -149,19 +149,19 @@ func (r *Record) String(cfg *config.Config) string {
 	line := ""
 
 	outFields := r.fieldOrder
-	if !cfg.All && len(cfg.OutputFields) > 0 {
-		outFields = cfg.OutputFields
-	}
+	if len(cfg.OutputFields) > 0 {
+		if cfg.All {
+			var reorderedFields []string = cfg.OutputFields
 
-	if cfg.All && len(cfg.OutputFields) > 0 {
-		var reorderedFields []string = cfg.OutputFields
-
-		for _, key := range r.fieldOrder {
-			if !slices.Contains(reorderedFields, key) {
-				reorderedFields = append(reorderedFields, key)
+			for _, key := range r.fieldOrder {
+				if !slices.Contains(reorderedFields, key) {
+					reorderedFields = append(reorderedFields, key)
+				}
 			}
+			outFields = reorderedFields
+		} else {
+			outFields = cfg.OutputFields
 		}
-		outFields = reorderedFields
 	}
 
 	for _, key := range outFields {
