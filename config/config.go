@@ -27,7 +27,7 @@ type Config struct {
 	Filter map[string]string
 	// NoTime disables the time output
 	NoTime bool
-	// Automaticly skip line thar arent selected
+	// Keep lines with no fields
 	KeepEmpty bool
 }
 
