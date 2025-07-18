@@ -44,3 +44,28 @@ jobs:
       with:
         name: logfmt-${{ matrix.goos }}-${{ matrix.goarch }} # Unique name for each artifact
         path: ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }} # Path to the built executable
+        retention-days: 1
+
+  create_release:
+    runs-on: ubuntu-latest
+    needs: build_release
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: release-artifacts
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: "Release ${{ github.ref_name }}"
+        body: |
+          Automated release for tag ${{ github.ref_name }}.
+        files: release-artifacts/*/*
