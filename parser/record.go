@@ -148,9 +148,8 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 func (r *Record) String(cfg *config.Config) string {
 	line := ""
 
-	// If OutputFields is specified, iterate through it to determine order
 	outFields := r.fieldOrder
-	if len(cfg.OutputFields) > 0 {
+	if !cfg.All && len(cfg.OutputFields) > 0 {
 		outFields = cfg.OutputFields
 	}
 
