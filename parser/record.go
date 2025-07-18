@@ -145,25 +145,20 @@ func (r *Record) String(cfg *config.Config) string {
 	line := ""
 
 	// If OutputFields is specified, iterate through it to determine order
+	outFields := r.fieldOrder
 	if len(cfg.OutputFields) > 0 {
-		for _, key := range cfg.OutputFields {
-			value, ok := r.fields[key]
-			if !ok {
-				continue
-			}
-			key := color.HiBlueString(key)
-			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+		outFields = cfg.OutputFields
+	}
+	for _, key := range outFields {
+		if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
+			continue
 		}
-	} else {
-		// If OutputFields in not set output in record order
-		for _, key := range r.fieldOrder {
-			if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
-				continue
-			}
-			value := r.fields[key]
-			key = color.HiBlueString(key)
-			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+		value, ok := r.fields[key]
+		if !ok {
+			continue
 		}
+		key := color.HiBlueString(key)
+		line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
 	}
 
 	if line == "" && !cfg.KeepEmpty {
