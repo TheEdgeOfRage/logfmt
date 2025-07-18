@@ -103,7 +103,7 @@ By default, `logfmt` doesn't output lines when no fields are selected. To **chan
 
 ### Raw output
 
-Dont output keys just values emulate lcut like bechaviour, also outputs timestamp and level keys by defult. With -o singleField allow getting one field
+Don't output keys just values (emulate lcut like behavior), also outputs timestamp and level keys by default. With -o singleField allow getting one field
 
 ### Output All
 
