@@ -37,12 +37,14 @@ Usage:
   logfmt [OPTIONS]
 
 Application Options:
-  -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
-  -o, --output=      Output field selector (comma separated)
-  -e, --exclude=     Exclude field selector (comma separated)
-  -f, --filter=      Filter fields (key=value comma separated)
-  -n, --no-color     Disable color output
-  -c, --force-color  Force color output, even when outputting to a pipe
+  -l, --level=          Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
+  -o, --output=         Output field selector (comma separated)
+  -O, --output-ordered= Output field selector (comma separated) but with order by command line args, not log values
+  -e, --exclude=        Exclude field selector (comma separated)
+  -f, --filter=         Filter fields (key=value comma separated)
+  -n, --no-color        Disable color output
+  -c, --force-color     Force color output, even when outputting to a pipe
+  -s, --skip-empty      Skips outputting lines where no fields were left after output and exclude
 
 Help Options:
   -h, --help         Show this help message
@@ -69,7 +71,7 @@ show up.
 
 #### Output field selection
 
-You can pass in a comma separated list of fields to the `-o` flag that you want it to print to the output. The timestamp
+You can pass in a comma separated list of fields to the `-o` or `-O` flag that you want it to print to the output. The timestamp
 and level are always printed, so this only applies to additional fields.
 
 #### Excluding fields
@@ -92,6 +94,9 @@ If you don't want to have colors on the output, set `-n`.
 
 By default, logfmt will detect if the output is a pipe or redirect to a file and will automatically disable colors. If
 you still want to have colorized output, for example when piping into `less`, you can force it using `-c`.
+
+### No Empty Lines 
+By default, `logfmt` outputs lines even when no fields are selected. To **change that behavior** and **suppress empty lines**, pass the `-s` flag.
 
 ### Sponsors
 
