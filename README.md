@@ -43,7 +43,7 @@ Application Options:
   -f, --filter=         Filter fields (key=value comma separated)
   -n, --no-color        Disable color output
   -c, --force-color     Force color output, even when outputting to a pipe
-  -s, --keep-empty      Keep lines with no field present selected by output or with all excluded
+  -k, --keep-empty      Keep lines with no field present selected by output or with all excluded
 
 Help Options:
   -h, --help         Show this help message
@@ -70,7 +70,7 @@ show up.
 
 #### Output field selection
 
-You can pass in a comma separated list of fields to the `-o` flag that you want it to print to the output. The timestamp
+You can pass in a comma separated list of fields to the `-o` or `-O` flag that you want it to print to the output. The timestamp
 and level are always printed, so this only applies to additional fields.
 
 #### Excluding fields
