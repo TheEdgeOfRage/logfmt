@@ -29,7 +29,7 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
       run: |
-        go build -ldflags="-s -w"  -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
+        go build -ldflags="-s -w" -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
       
     - name: Compress with UPX (Linux only)
       if: matrix.goos == 'linux'
@@ -39,7 +39,8 @@ jobs:
           ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
         args: --best --lzma
 
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v2
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
       with:
-        files: ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
+        name: logfmt-${{ matrix.goos }}-${{ matrix.goarch }} # Unique name for each artifact
+        path: ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }} # Path to the built executable
