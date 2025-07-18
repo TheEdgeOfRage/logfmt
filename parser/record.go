@@ -154,8 +154,8 @@ func (r *Record) String(cfg *config.Config) string {
 			if !ok {
 				continue
 			}
-			formattedKey := color.HiBlueString(key)
-			line += fmt.Sprintf(" %s=%s", formattedKey, getFormattedValue(value))
+			key := color.HiBlueString(key)
+			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
 		}
 	} else {
 		// If OrderOutputFields output in record order
