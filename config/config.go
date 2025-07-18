@@ -31,7 +31,7 @@ type Config struct {
 	KeepEmpty bool
 	// Only values
 	Raw bool
-	// All afterer ordered
+	// All after output in record order (causes output to become order)
 	All bool
 }
 
@@ -45,7 +45,7 @@ type rawConfig struct {
 	NoTime        bool   `long:"no-time" short:"t" description:"Disable time output"`
 	KeepEmpty     bool   `long:"keep-empty" short:"k" description:"Keep lines with no field present selected by output or with all excluded"`
 	Raw           bool   `long:"raw" short:"r" description:"Output only selected fields values (comma separated) lcut like"`
-	All           bool   `long:"all" short:"A" description:"Output all field after the output-ordered"`
+	All           bool   `long:"all" short:"A" description:"Output all field after the output fields effectivly making it ordered"`
 }
 
 func Parse() (*Config, error) {
