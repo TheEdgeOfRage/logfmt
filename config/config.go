@@ -21,22 +21,28 @@ type Config struct {
 	LogLevel int
 	// OutputFields is a list of fields to include on the log output
 	OutputFields []string
+	// OrderOutputFields is a list of fields to include on the log output in order
+	OrderOutputFields []string
 	// ExcludeFields is a list of fields to exclude from the log output
 	ExcludeFields []string
 	// Filter is a map of fields and values which are used to filter the log output
 	Filter map[string]string
 	// NoTime disables the time output
 	NoTime bool
+	// Automaticly skip line thar arent selected
+	SkipEmpty bool
 }
 
 type rawConfig struct {
-	LogLevel      string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
-	OutputFields  string `long:"output" short:"o" description:"Output field selector (comma separated)"`
-	ExcludeFields string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
-	Filter        string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
-	NoColor       bool   `long:"no-color" short:"n" description:"Disable color output"`
-	ForceColor    bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
-	NoTime        bool   `long:"no-time" short:"t" description:"Disable time output"`
+	LogLevel      		string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
+	OutputFields  		string `long:"output" short:"o" description:"Output field selector (comma separated)"`
+	OrderOutputFields string `long:"output-ordered" short:"O" description:"Output field selector (comma separated) the print order is guaranted"`
+	ExcludeFields 		string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
+	Filter        		string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
+	NoColor       		bool   `long:"no-color" short:"n" description:"Disable color output"`
+	ForceColor    		bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
+	NoTime        		bool   `long:"no-time" short:"t" description:"Disable time output"`
+	SkipEmpty					bool 	 `long:"skip-empty" short:"s" description:"Disable outputing if no selected values are present"`
 }
 
 func Parse() (*Config, error) {
@@ -48,9 +54,14 @@ func Parse() (*Config, error) {
 		return nil, err
 	}
 
+	if raw.OrderOutputFields != "" && raw.OutputFields != ""  {
+		return nil, fmt.Errorf("cannot use both --output and --output-ordered")
+	}
+
 	cfg := Config{
 		OutputFields:  parseFieldList(raw.OutputFields),
 		ExcludeFields: parseFieldList(raw.ExcludeFields),
+		OrderOutputFields: parseFieldList(raw.OrderOutputFields),
 	}
 	err = cfg.setFilter(raw.Filter)
 	if err != nil {
@@ -72,7 +83,9 @@ func Parse() (*Config, error) {
 	if raw.NoTime {
 		cfg.NoTime = true
 	}
-
+	if raw.SkipEmpty {
+		cfg.SkipEmpty = true
+	}
 	return &cfg, nil
 }
 

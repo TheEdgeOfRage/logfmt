@@ -38,10 +38,12 @@ func (p *Parser) Start() error {
 		if len(p.cfg.Filter) > 0 && !record.MatchesFilter(p.cfg.Filter) {
 			continue
 		}
-
-		_, err = fmt.Fprintf(p.output, "%s\n", record.String(p.cfg))
-		if err != nil {
-			return fmt.Errorf("failed to print log to output: %w", err)
+		line := record.String(p.cfg)
+		if line != "" {
+			_, err = fmt.Fprintf(p.output, "%s\n", record.String(p.cfg))
+			if err != nil {
+				return fmt.Errorf("failed to print log to output: %w", err)
+			}
 		}
 	}
 
