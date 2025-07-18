@@ -29,7 +29,15 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
       run: |
-        go build -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
+        go build -ldflags="-s -w"  -o logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
+      
+    - name: Compress with UPX (Linux only)
+      if: matrix.goos == 'linux'
+      uses: crazy-max/ghaction-upx@v3
+      with:
+        files: |
+          ./logfmt-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.ref_name }}
+        args: --best --lzma
 
     - name: Upload Release Asset
       uses: softprops/action-gh-release@v2
