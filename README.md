@@ -70,7 +70,7 @@ show up.
 
 #### Output field selection
 
-You can pass in a comma separated list of fields to the `-o` or `-O` flag that you want it to print to the output. The timestamp
+You can pass in a comma separated list of fields to the `-o` flag that you want it to print to the output. The timestamp
 and level are always printed, so this only applies to additional fields.
 
 #### Excluding fields
@@ -94,8 +94,9 @@ If you don't want to have colors on the output, set `-n`.
 By default, logfmt will detect if the output is a pipe or redirect to a file and will automatically disable colors. If
 you still want to have colorized output, for example when piping into `less`, you can force it using `-c`.
 
-### No Empty Lines 
-By default, `logfmt` outputs lines even when no fields are selected. To **change that behavior** and **suppress empty lines**, pass the `-s` flag.
+### Show empty lines 
+
+By default, `logfmt` doesn't output lines when no fields are selected. To **change that behavior** and **show empty lines**, pass the `-k` flag.
 
 ### Sponsors
 
