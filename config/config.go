@@ -36,13 +36,13 @@ type Config struct {
 type rawConfig struct {
 	LogLevel      		string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
 	OutputFields  		string `long:"output" short:"o" description:"Output field selector (comma separated)"`
-	OrderOutputFields string `long:"output-ordered" short:"O" description:"Output field selector (comma separated) the print order is guaranted"`
+	OrderOutputFields 	string `long:"output-ordered" short:"O" description:"Output field selector (comma separated) the print order is guaranted"`
 	ExcludeFields 		string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
 	Filter        		string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
 	NoColor       		bool   `long:"no-color" short:"n" description:"Disable color output"`
 	ForceColor    		bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
 	NoTime        		bool   `long:"no-time" short:"t" description:"Disable time output"`
-	SkipEmpty					bool 	 `long:"skip-empty" short:"s" description:"Disable outputing if no selected values are present"`
+	SkipEmpty		bool   `long:"skip-empty" short:"s" description:"Disable outputing if no selected values are present"`
 }
 
 func Parse() (*Config, error) {
