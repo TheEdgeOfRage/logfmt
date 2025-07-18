@@ -37,12 +37,13 @@ Usage:
   logfmt [OPTIONS]
 
 Application Options:
-  -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
-  -o, --output=      Output field selector (comma separated)
-  -e, --exclude=     Exclude field selector (comma separated)
-  -f, --filter=      Filter fields (key=value comma separated)
-  -n, --no-color     Disable color output
-  -c, --force-color  Force color output, even when outputting to a pipe
+  -l, --level=          Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
+  -o, --output=         Output field selector (comma separated)
+  -e, --exclude=        Exclude field selector (comma separated)
+  -f, --filter=         Filter fields (key=value comma separated)
+  -n, --no-color        Disable color output
+  -c, --force-color     Force color output, even when outputting to a pipe
+  -s, --keep-empty      Keep lines with no field present selected by output or with all excluded
 
 Help Options:
   -h, --help         Show this help message
@@ -92,6 +93,10 @@ If you don't want to have colors on the output, set `-n`.
 
 By default, logfmt will detect if the output is a pipe or redirect to a file and will automatically disable colors. If
 you still want to have colorized output, for example when piping into `less`, you can force it using `-c`.
+
+### Show empty lines 
+
+By default, `logfmt` doesn't output lines when no fields are selected. To **change that behavior** and **show empty lines**, pass the `-k` flag.
 
 ### Sponsors
 

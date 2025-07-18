@@ -33,20 +33,20 @@ time="2025-03-15T10:32:27Z" level=fatal msg="AAAAAA"`)
 }
 
 func TestParseTimestamps(t *testing.T) {
-	data := strings.NewReader(`timestamp="2025-03-15T10:32:23Z" level=info
-time="2025-03-15T10:32:24Z" level=info
-ts="2025-03-15T10:32:25Z" level=info
-datetime="2025-03-15T10:32:26Z" level=info`)
+	data := strings.NewReader(`timestamp="2025-03-15T10:32:23Z" level=info msg=foo
+time="2025-03-15T10:32:24Z" level=info msg=foo
+ts="2025-03-15T10:32:25Z" level=info msg=foo
+datetime="2025-03-15T10:32:26Z" level=info msg=foo`)
 	w := &bytes.Buffer{}
 
 	p := parser.NewParser(&config.Config{}, data, w)
 	err := p.Start()
 	require.NoError(t, err)
 
-	assert.Equal(t, `2025-03-15 10:32:23  [INFO]
-2025-03-15 10:32:24  [INFO]
-2025-03-15 10:32:25  [INFO]
-2025-03-15 10:32:26  [INFO]
+	assert.Equal(t, `2025-03-15 10:32:23  [INFO] msg=foo
+2025-03-15 10:32:24  [INFO] msg=foo
+2025-03-15 10:32:25  [INFO] msg=foo
+2025-03-15 10:32:26  [INFO] msg=foo
 `, w.String())
 }
 

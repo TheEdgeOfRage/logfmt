@@ -143,16 +143,26 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 // String returns a formatted string representation of the Record
 func (r *Record) String(cfg *config.Config) string {
 	line := ""
-	for _, key := range r.fieldOrder {
-		if len(cfg.OutputFields) > 0 && !slices.Contains(cfg.OutputFields, key) {
-			continue
-		}
+
+	// If OutputFields is specified, iterate through it to determine order
+	outFields := r.fieldOrder
+	if len(cfg.OutputFields) > 0 {
+		outFields = cfg.OutputFields
+	}
+	for _, key := range outFields {
 		if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
 			continue
 		}
-		value := r.fields[key]
-		key = color.HiBlueString(key)
+		value, ok := r.fields[key]
+		if !ok {
+			continue
+		}
+		key := color.HiBlueString(key)
 		line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+	}
+
+	if line == "" && !cfg.KeepEmpty {
+		return ""
 	}
 
 	var fmtString strings.Builder

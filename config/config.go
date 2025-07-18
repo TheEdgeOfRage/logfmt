@@ -27,16 +27,19 @@ type Config struct {
 	Filter map[string]string
 	// NoTime disables the time output
 	NoTime bool
+	// Keep lines with no fields
+	KeepEmpty bool
 }
 
 type rawConfig struct {
-	LogLevel      string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
-	OutputFields  string `long:"output" short:"o" description:"Output field selector (comma separated)"`
-	ExcludeFields string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
-	Filter        string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
-	NoColor       bool   `long:"no-color" short:"n" description:"Disable color output"`
-	ForceColor    bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
-	NoTime        bool   `long:"no-time" short:"t" description:"Disable time output"`
+	LogLevel      		string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
+	OutputFields  		string `long:"output" short:"o" description:"Output field selector (comma separated)"`
+	ExcludeFields 		string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
+	Filter        		string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
+	NoColor       		bool   `long:"no-color" short:"n" description:"Disable color output"`
+	ForceColor    		bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
+	NoTime        		bool   `long:"no-time" short:"t" description:"Disable time output"`
+	KeepEmpty		bool   `long:"keep-empty" short:"k" description:"Keep lines with no field present selected by output or with all excluded"`
 }
 
 func Parse() (*Config, error) {
@@ -46,6 +49,10 @@ func Parse() (*Config, error) {
 	_, err := parser.Parse()
 	if err != nil {
 		return nil, err
+	}
+
+	if raw.ExcludeFields != "" && raw.OutputFields != ""  {
+		return nil, fmt.Errorf("cannot use both --exclude and --output")
 	}
 
 	cfg := Config{
@@ -72,7 +79,9 @@ func Parse() (*Config, error) {
 	if raw.NoTime {
 		cfg.NoTime = true
 	}
-
+	if raw.KeepEmpty {
+		cfg.KeepEmpty = true
+	}
 	return &cfg, nil
 }
 
