@@ -107,7 +107,7 @@ Dont output keys just values emulate lcut like bechaviour, also outputs timestam
 
 ### Output All
 
-Output all keys if option is set and treat option as an order which fileds shoud be displyed first
+Output all keys if option is set and treat option as an order which fileds schould be displayed first
 
 ### Sponsors
 
