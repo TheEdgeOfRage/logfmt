@@ -37,13 +37,16 @@ Usage:
   logfmt [OPTIONS]
 
 Application Options:
-  -l, --level=          Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
-  -o, --output=         Output field selector (comma separated)
-  -e, --exclude=        Exclude field selector (comma separated)
-  -f, --filter=         Filter fields (key=value comma separated)
-  -n, --no-color        Disable color output
-  -c, --force-color     Force color output, even when outputting to a pipe
-  -s, --keep-empty      Keep lines with no field present selected by output or with all excluded
+  -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
+  -o, --output=      Output field selector (comma separated)
+  -e, --exclude=     Exclude field selector (comma separated)
+  -f, --filter=      Filter fields (key=value comma separated)
+  -n, --no-color     Disable color output
+  -c, --force-color  Force color output, even when outputting to a pipe
+  -t, --no-time      Disable time output
+  -k, --keep-empty   Keep lines with no field present selected by output or with all excluded
+  -r, --raw          Output only selected fields values (comma separated) lcut like
+  -A, --all          Output all field after the output fields effectivly making it ordered
 
 Help Options:
   -h, --help         Show this help message
@@ -97,6 +100,14 @@ you still want to have colorized output, for example when piping into `less`, yo
 ### Show empty lines 
 
 By default, `logfmt` doesn't output lines when no fields are selected. To **change that behavior** and **show empty lines**, pass the `-k` flag.
+
+### Raw output
+
+Don't output keys just values (emulate lcut like behavior), also outputs timestamp and level keys by default. With -o singleField allow getting one field
+
+### Output All
+
+Output all keys if flag is set and treat output option as an order which fields should be displayed first
 
 ### Sponsors
 

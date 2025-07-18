@@ -28,7 +28,7 @@ func NewParser(cfg *config.Config, input io.Reader, output io.Writer) *Parser {
 func (p *Parser) Start() error {
 	decoder := logfmt.NewDecoder(p.input)
 	for decoder.ScanRecord() {
-		record, err := NewRecord(decoder)
+		record, err := NewRecord(decoder, p.cfg)
 		if err != nil {
 			return err
 		}
