@@ -157,7 +157,7 @@ func (r *Record) String(cfg *config.Config) string {
 		var reorderedFields []string = cfg.OutputFields
 
 		for _, key := range r.fieldOrder {
-			if slices.Contains(reorderedFields, key) {
+			if !slices.Contains(reorderedFields, key) {
 				reorderedFields = append(reorderedFields, key)
 			}
 		}
