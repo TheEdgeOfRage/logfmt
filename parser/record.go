@@ -144,12 +144,9 @@ func (r *Record) MatchesFilter(filter map[string]string) bool {
 func (r *Record) String(cfg *config.Config) string {
 	line := ""
 
-	// If OrderOutputFields is specified, iterate through it to determine order
-	if len(cfg.OrderOutputFields) > 0 {
-		for _, key := range cfg.OrderOutputFields {
-			if slices.Contains(cfg.ExcludeFields, key) {
-				continue
-			}
+	// If OutputFields is specified, iterate through it to determine order
+	if len(cfg.OutputFields) > 0 {
+		for _, key := range cfg.OutputFields {
 			value, ok := r.fields[key]
 			if !ok {
 				continue
@@ -158,11 +155,8 @@ func (r *Record) String(cfg *config.Config) string {
 			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
 		}
 	} else {
-		// If OrderOutputFields output in record order
+		// If OutputFields in not set output in record order
 		for _, key := range r.fieldOrder {
-			if len(cfg.OutputFields) > 0 && !slices.Contains(cfg.OutputFields, key) {
-				continue
-			}
 			if len(cfg.ExcludeFields) > 0 && slices.Contains(cfg.ExcludeFields, key) {
 				continue
 			}
@@ -172,7 +166,7 @@ func (r *Record) String(cfg *config.Config) string {
 		}
 	}
 
-	if line == "" && cfg.SkipEmpty {
+	if line == "" && !cfg.KeepEmpty {
 		return ""
 	}
 

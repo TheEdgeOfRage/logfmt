@@ -39,12 +39,11 @@ Usage:
 Application Options:
   -l, --level=          Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
   -o, --output=         Output field selector (comma separated)
-  -O, --output-ordered= Output field selector (comma separated) but with order by command line args, not log values
   -e, --exclude=        Exclude field selector (comma separated)
   -f, --filter=         Filter fields (key=value comma separated)
   -n, --no-color        Disable color output
   -c, --force-color     Force color output, even when outputting to a pipe
-  -s, --skip-empty      Skips outputting lines where no fields were left after output and exclude
+  -s, --keep-empty      Keep lines with no field present selected by output or with all excluded
 
 Help Options:
   -h, --help         Show this help message
