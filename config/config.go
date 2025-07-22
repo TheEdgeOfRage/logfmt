@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	Debug = iota
+	Trace = iota
+	Debug
 	Info
 	Warning
 	Error
@@ -36,7 +37,7 @@ type Config struct {
 }
 
 type rawConfig struct {
-	LogLevel      string `long:"level" short:"l" description:"Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
+	LogLevel      string `long:"level" short:"l" description:"Log level filter. One of TRACE, DEBUG, INFO, WARN, ERROR, FATAL" default:"INFO"` // nolint:lll
 	OutputFields  string `long:"output" short:"o" description:"Output field selector (comma separated)"`
 	ExcludeFields string `long:"exclude" short:"e" description:"Exclude field selector (comma separated)"`
 	Filter        string `long:"filter" short:"f" description:"Filter fields (key=value comma separated)"`
@@ -99,6 +100,8 @@ func Parse() (*Config, error) {
 
 func (c *Config) setLevel(level string) error {
 	switch level {
+	case "TRACE":
+		c.LogLevel = Trace
 	case "DEBUG":
 		c.LogLevel = Debug
 	case "INFO":

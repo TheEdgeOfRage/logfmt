@@ -13,7 +13,8 @@ import (
 )
 
 func TestParseLevels(t *testing.T) {
-	data := strings.NewReader(`time="2025-03-15T10:32:23Z" level=debug msg="bar"
+	data := strings.NewReader(`time="2025-03-15T10:32:22Z" level=trace msg="foobar"
+time="2025-03-15T10:32:23Z" level=debug msg="bar"
 time="2025-03-15T10:32:24Z" level=info msg="foo"
 time="2025-03-15T10:32:25Z" level=warn msg="oopsie"
 time="2025-03-15T10:32:26Z" level=error msg="oh no"
@@ -24,7 +25,8 @@ time="2025-03-15T10:32:27Z" level=fatal msg="AAAAAA"`)
 	err := p.Start()
 	require.NoError(t, err)
 
-	assert.Equal(t, `2025-03-15 10:32:23 [DEBUG] msg=bar
+	assert.Equal(t, `2025-03-15 10:32:22 [TRACE] msg=foobar
+2025-03-15 10:32:23 [DEBUG] msg=bar
 2025-03-15 10:32:24  [INFO] msg=foo
 2025-03-15 10:32:25  [WARN] msg=oopsie
 2025-03-15 10:32:26 [ERROR] msg="oh no"
