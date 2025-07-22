@@ -1,22 +1,46 @@
 ---
+version: "2"
 linters:
   enable:
-    - goimports
-    - stylecheck
+    - forbidigo
     - lll
+    - prealloc
+    - predeclared
+    - staticcheck
     - errcheck
-
-run:
-  go: '1.22'
-  timeout: 30s
-
-issues:
-  exclude-rules:
-    - linters:
-        - lll
-      source: "// nolint:lll"
-    - linters:
-        - unused
-        - deadcode
-        - varcheck
-      source: "// nolint:unused"
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - lll
+        source: // nolint:lll
+      - linters:
+          - staticcheck
+        source: // nolint:stylecheck
+      - linters:
+          - deadcode
+          - revive
+          - unused
+          - varcheck
+        source: // nolint:unused
+      - linters:
+          - staticcheck
+        text: 'SA1019:'
+        source: // ignore:deprecated
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - localmodule

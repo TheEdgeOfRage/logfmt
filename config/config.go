@@ -44,9 +44,9 @@ type rawConfig struct {
 	NoColor       bool   `long:"no-color" short:"n" description:"Disable color output"`
 	ForceColor    bool   `long:"force-color" short:"c" description:"Force color output, even when outputting to a pipe"`
 	NoTime        bool   `long:"no-time" short:"t" description:"Disable time output"`
-	KeepEmpty     bool   `long:"keep-empty" short:"k" description:"Keep lines with no field present selected by output or with all excluded"`
-	Raw           bool   `long:"raw" short:"r" description:"Output only selected fields values (comma separated) lcut like"`
-	All           bool   `long:"all" short:"A" description:"Output all field after the output fields effectivly making it ordered"`
+	KeepEmpty     bool   `long:"keep-empty" short:"k" description:"Keep lines with no field present selected by output or with all excluded"` // nolint:lll
+	Raw           bool   `long:"raw" short:"r" description:"Output only selected fields values (comma separated) lcut like"`                  // nolint:lll
+	All           bool   `long:"all" short:"A" description:"Output all field after the output fields effectivly making it ordered"`           // nolint:lll
 }
 
 func Parse() (*Config, error) {

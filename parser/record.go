@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheEdgeOfRage/logfmt/config"
 	"github.com/fatih/color"
 	"github.com/go-logfmt/logfmt"
+
+	"github.com/TheEdgeOfRage/logfmt/config"
 )
 
 var (
@@ -155,7 +156,7 @@ func (r *Record) String(cfg *config.Config) string {
 	outFields := r.fieldOrder
 	if len(cfg.OutputFields) > 0 {
 		if cfg.All {
-			var reorderedFields []string = cfg.OutputFields
+			reorderedFields := cfg.OutputFields
 
 			for _, key := range r.fieldOrder {
 				if !slices.Contains(reorderedFields, key) {
