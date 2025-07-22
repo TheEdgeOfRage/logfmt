@@ -37,7 +37,7 @@ Usage:
   logfmt [OPTIONS]
 
 Application Options:
-  -l, --level=       Log level filter. One of DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
+  -l, --level=       Log level filter. One of TRACE, DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)
   -o, --output=      Output field selector (comma separated)
   -e, --exclude=     Exclude field selector (comma separated)
   -f, --filter=      Filter fields (key=value comma separated)

@@ -20,6 +20,7 @@ var (
 
 func init() {
 	levelColors = map[int]*color.Color{
+		config.Trace:   color.New(color.FgBlack).Add(color.BgHiBlue).Add(color.Bold),
 		config.Debug:   color.New(color.FgBlack).Add(color.BgCyan).Add(color.Bold),
 		config.Info:    color.New(color.FgBlack).Add(color.BgGreen).Add(color.Bold),
 		config.Warning: color.New(color.FgBlack).Add(color.BgYellow).Add(color.Bold),
@@ -27,6 +28,7 @@ func init() {
 		config.Fatal:   color.New(color.FgRed).Add(color.BgBlack).Add(color.Bold),
 	}
 	levelStrings = map[int]string{
+		config.Trace:   "TRACE",
 		config.Debug:   "DEBUG",
 		config.Info:    "INFO",
 		config.Warning: "WARN",
@@ -110,6 +112,8 @@ func getFormattedLevel(level int) string {
 
 func (r *Record) parseLevel(level string) {
 	switch strings.ToUpper(level) {
+	case "TRACE":
+		r.level = config.Trace
 	case "DEBUG":
 		r.level = config.Debug
 	case "INFO":
