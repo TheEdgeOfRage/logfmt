@@ -115,15 +115,15 @@ func (r *Record) parseLevel(level string) {
 	switch strings.ToUpper(level) {
 	case "TRACE":
 		r.level = config.Trace
-	case "DEBUG":
+	case "DBUG", "DEBUG":
 		r.level = config.Debug
-	case "INFO":
+	case "INFO", "INFORMATION", "INFORMATIONAL", "NOTICE":
 		r.level = config.Info
 	case "WARN", "WARNING":
 		r.level = config.Warning
-	case "ERROR":
+	case "ERR", "EROR", "ERROR":
 		r.level = config.Error
-	case "FATAL":
+	case "EMERG", "FATAL", "ALERT", "CRIT", "CRITICAL":
 		r.level = config.Fatal
 	default:
 		r.level = config.Info
