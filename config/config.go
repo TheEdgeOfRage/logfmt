@@ -34,6 +34,8 @@ type Config struct {
 	Raw bool
 	// All after output in record order (causes output to become order)
 	All bool
+	// How long can a line be?
+	BufferSize int
 }
 
 type rawConfig struct {
@@ -47,6 +49,7 @@ type rawConfig struct {
 	KeepEmpty     bool   `long:"keep-empty" short:"k" description:"Keep lines with no field present selected by output or with all excluded"` // nolint:lll
 	Raw           bool   `long:"raw" short:"r" description:"Output only selected fields values (comma separated) lcut like"`                  // nolint:lll
 	All           bool   `long:"all" short:"A" description:"Output all field after the output fields effectivly making it ordered"`           // nolint:lll
+	BufferSize    int    `long:"buffer-size" short:"B" description:"How long should a line be expected to be?" default:"1048576"`
 }
 
 func Parse() (*Config, error) {
@@ -94,6 +97,9 @@ func Parse() (*Config, error) {
 	}
 	if raw.All {
 		cfg.All = true
+	}
+	if raw.BufferSize != 0 {
+		cfg.BufferSize = raw.BufferSize
 	}
 	return &cfg, nil
 }
