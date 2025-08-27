@@ -17,6 +17,9 @@ type Parser struct {
 }
 
 func NewParser(cfg *config.Config, input io.Reader, output io.Writer) *Parser {
+	if cfg.BufferSize == 0 {
+		cfg.BufferSize = 1048576
+	}
 	return &Parser{
 		cfg:    cfg,
 		input:  input,
