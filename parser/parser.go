@@ -26,7 +26,7 @@ func NewParser(cfg *config.Config, input io.Reader, output io.Writer) *Parser {
 
 // Start starts the parser, reading from the input stream and printing the log output to the output stream line by line
 func (p *Parser) Start() error {
-	decoder := logfmt.NewDecoder(p.input)
+	decoder := logfmt.NewDecoderSize(p.input, p.cfg.BufferSize)
 	for decoder.ScanRecord() {
 		record, err := NewRecord(decoder, p.cfg)
 		if err != nil {
