@@ -142,7 +142,8 @@ func (r *Record) parseTime(timeStr string) error {
 
 func (r *Record) MatchesFilter(filter map[string]string) bool {
 	for key, value := range filter {
-		if r.fields[key] != value {
+		actual, ok := r.fields[key]
+		if !ok || actual != value {
 			return false
 		}
 	}
