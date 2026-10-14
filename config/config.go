@@ -141,7 +141,7 @@ func (c *Config) setFilter(filter string) error {
 	c.Filter = make(map[string]string)
 	for _, f := range filters {
 		f = strings.Trim(f, " ")
-		parts := strings.Split(f, "=")
+		parts := strings.SplitN(f, "=", 2)
 		if len(parts) != 2 {
 			return fmt.Errorf("invalid filter: %s", f)
 		}
