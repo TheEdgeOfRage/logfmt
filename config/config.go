@@ -8,8 +8,12 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+const DefaultBufferSize = 1048576
+
+type Level int
+
 const (
-	Trace = iota
+	Trace Level = iota
 	Debug
 	Info
 	Warning
@@ -19,13 +23,15 @@ const (
 
 type Config struct {
 	// LogLevel is the level filter for the log output
-	LogLevel int
+	LogLevel Level
 	// OutputFields is a list of fields to include on the log output
 	OutputFields []string
 	// ExcludeFields is a list of fields to exclude from the log output
 	ExcludeFields []string
 	// Filter is a map of fields and values which are used to filter the log output
 	Filter map[string]string
+	// NoColor disables color output
+	NoColor bool
 	// NoTime disables the time output
 	NoTime bool
 	// Keep lines with no fields
@@ -68,6 +74,7 @@ func Parse() (*Config, error) {
 	cfg := Config{
 		OutputFields:  parseFieldList(raw.OutputFields),
 		ExcludeFields: parseFieldList(raw.ExcludeFields),
+		BufferSize:    raw.BufferSize,
 	}
 	err = cfg.setFilter(raw.Filter)
 	if err != nil {
@@ -86,26 +93,16 @@ func Parse() (*Config, error) {
 	if raw.NoColor {
 		color.NoColor = true
 	}
-	if raw.NoTime {
-		cfg.NoTime = true
-	}
-	if raw.KeepEmpty {
-		cfg.KeepEmpty = true
-	}
-	if raw.Raw {
-		cfg.Raw = true
-	}
-	if raw.All {
-		cfg.All = true
-	}
-	if raw.BufferSize != 0 {
-		cfg.BufferSize = raw.BufferSize
-	}
+	cfg.NoColor = color.NoColor
+	cfg.NoTime = raw.NoTime
+	cfg.KeepEmpty = raw.KeepEmpty
+	cfg.Raw = raw.Raw
+	cfg.All = raw.All
 	return &cfg, nil
 }
 
 func (c *Config) setLevel(level string) error {
-	switch level {
+	switch strings.ToUpper(level) {
 	case "TRACE":
 		c.LogLevel = Trace
 	case "DEBUG":
@@ -129,7 +126,15 @@ func parseFieldList(fields string) []string {
 	if fields == "" {
 		return nil
 	}
-	return strings.Split(fields, ",")
+	var result []string
+	for _, field := range strings.Split(fields, ",") {
+		field = strings.TrimSpace(field)
+		if field == "" {
+			continue
+		}
+		result = append(result, field)
+	}
+	return result
 }
 
 func (c *Config) setFilter(filter string) error {
@@ -140,12 +145,19 @@ func (c *Config) setFilter(filter string) error {
 	filters := strings.Split(filter, ",")
 	c.Filter = make(map[string]string)
 	for _, f := range filters {
-		f = strings.Trim(f, " ")
+		f = strings.TrimSpace(f)
+		if f == "" {
+			continue
+		}
 		parts := strings.SplitN(f, "=", 2)
 		if len(parts) != 2 {
 			return fmt.Errorf("invalid filter: %s", f)
 		}
-		c.Filter[parts[0]] = parts[1]
+		key := strings.TrimSpace(parts[0])
+		if key == "" {
+			return fmt.Errorf("invalid filter: %s", f)
+		}
+		c.Filter[key] = strings.TrimSpace(parts[1])
 	}
 	return nil
 }

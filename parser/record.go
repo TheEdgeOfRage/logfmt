@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	levelStrings    map[int]string
-	levelColors     map[int]*color.Color
+	levelStrings    map[config.Level]string
+	levelColors     map[config.Level]*color.Color
 	timestampLabels = []string{"time", "timestamp", "datetime", "ts", "t"}
 )
 
 func init() {
-	levelColors = map[int]*color.Color{
+	levelColors = map[config.Level]*color.Color{
 		config.Trace:   color.New(color.FgBlack).Add(color.BgHiBlue).Add(color.Bold),
 		config.Debug:   color.New(color.FgBlack).Add(color.BgCyan).Add(color.Bold),
 		config.Info:    color.New(color.FgBlack).Add(color.BgGreen).Add(color.Bold),
@@ -28,7 +28,7 @@ func init() {
 		config.Error:   color.New(color.FgBlack).Add(color.BgRed).Add(color.Bold),
 		config.Fatal:   color.New(color.FgRed).Add(color.BgBlack).Add(color.Bold),
 	}
-	levelStrings = map[int]string{
+	levelStrings = map[config.Level]string{
 		config.Trace:   "TRACE",
 		config.Debug:   "DEBUG",
 		config.Info:    "INFO",
@@ -40,23 +40,26 @@ func init() {
 
 // Record represents a single log line
 type Record struct {
-	level      int
+	level      config.Level
 	time       time.Time
 	fields     map[string]string
 	fieldOrder []string
 }
 
-// NewRecord parses a new Record from a logfmt.Decoder
-func NewRecord(decoder *logfmt.Decoder, cfg *config.Config) (*Record, error) {
-	var record Record
-	record.fields = make(map[string]string)
-	record.fieldOrder = make([]string, 0)
+// NewRecord parses a new Record from a single log line
+func NewRecord(line string, cfg *config.Config, bufferSize int) (*Record, error) {
+	record := &Record{
+		level:      config.Info,
+		fields:     make(map[string]string),
+		fieldOrder: make([]string, 0),
+	}
+
+	decoder := logfmt.NewDecoderSize(strings.NewReader(line), bufferSize)
+	if !decoder.ScanRecord() {
+		return record, nil
+	}
 
 	for decoder.ScanKeyval() {
-		err := decoder.Err()
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse log line: %w", decoder.Err())
-		}
 		key, value := string(decoder.Key()), string(decoder.Value())
 		if key == "level" {
 			record.parseLevel(value)
@@ -65,19 +68,25 @@ func NewRecord(decoder *logfmt.Decoder, cfg *config.Config) (*Record, error) {
 			}
 		}
 		if slices.Contains(timestampLabels, key) {
-			err := record.parseTime(value)
-			if err != nil {
-				return nil, err
+			if t, err := time.Parse(time.RFC3339, value); err == nil {
+				record.time = t
+				if !cfg.Raw {
+					continue
+				}
 			}
-			if !cfg.Raw {
-				continue
-			}
+			// otherwise: treat the field as any other
 		}
 		record.fields[key] = value
-		record.fieldOrder = append(record.fieldOrder, key)
+		if !slices.Contains(record.fieldOrder, key) {
+			record.fieldOrder = append(record.fieldOrder, key)
+		}
 	}
 
-	return &record, nil
+	if err := decoder.Err(); err != nil {
+		return nil, err
+	}
+
+	return record, nil
 }
 
 func isNumeric(s string) bool {
@@ -91,7 +100,11 @@ func isBoolean(s string) bool {
 }
 
 func isNull(s string) bool {
-	return s == "null" || s == "NULL" || s == "nil" || s == "<nil>" || s == "None"
+	switch strings.ToLower(s) {
+	case "null", "nil", "<nil>", "none":
+		return true
+	}
+	return false
 }
 
 func getFormattedValue(value string) string {
@@ -101,13 +114,13 @@ func getFormattedValue(value string) string {
 	if isNull(value) {
 		return color.YellowString(value)
 	}
-	if strings.Contains(value, " ") {
-		value = fmt.Sprintf(`"%s"`, value)
+	if strings.ContainsAny(value, " \"") {
+		value = "\"" + strings.ReplaceAll(value, "\"", "\\\"") + "\""
 	}
 	return color.HiGreenString(value)
 }
 
-func getFormattedLevel(level int) string {
+func getFormattedLevel(level config.Level) string {
 	return levelColors[level].Sprintf("[%s]", levelStrings[level])
 }
 
@@ -130,16 +143,6 @@ func (r *Record) parseLevel(level string) {
 	}
 }
 
-func (r *Record) parseTime(timeStr string) error {
-	t, err := time.Parse(time.RFC3339, timeStr)
-	if err != nil {
-		return fmt.Errorf("failed to parse timestamp: %w", err)
-	}
-
-	r.time = t
-	return nil
-}
-
 func (r *Record) MatchesFilter(filter map[string]string) bool {
 	for key, value := range filter {
 		actual, ok := r.fields[key]
@@ -157,8 +160,8 @@ func (r *Record) String(cfg *config.Config) string {
 	outFields := r.fieldOrder
 	if len(cfg.OutputFields) > 0 {
 		if cfg.All {
-			reorderedFields := cfg.OutputFields
-
+			reorderedFields := make([]string, 0, len(cfg.OutputFields)+len(r.fieldOrder))
+			reorderedFields = append(reorderedFields, cfg.OutputFields...)
 			for _, key := range r.fieldOrder {
 				if !slices.Contains(reorderedFields, key) {
 					reorderedFields = append(reorderedFields, key)
@@ -199,7 +202,7 @@ func (r *Record) String(cfg *config.Config) string {
 		fmtString.WriteString("%s ")
 	}
 
-	if color.NoColor {
+	if cfg.NoColor {
 		fmtString.WriteString("%7s%s")
 	} else {
 		fmtString.WriteString("%26s%s")
@@ -207,7 +210,11 @@ func (r *Record) String(cfg *config.Config) string {
 
 	if cfg.NoTime {
 		return fmt.Sprintf(fmtString.String(), getFormattedLevel(r.level), line)
-	} else {
-		return fmt.Sprintf(fmtString.String(), r.time.Format("2006-01-02 15:04:05"), getFormattedLevel(r.level), line)
 	}
+
+	ts := strings.Repeat(" ", 19)
+	if !r.time.IsZero() {
+		ts = r.time.Format("2006-01-02 15:04:05")
+	}
+	return fmt.Sprintf(fmtString.String(), ts, getFormattedLevel(r.level), line)
 }

@@ -1,39 +1,45 @@
 package parser
 
 import (
-	"errors"
+	"bufio"
 	"fmt"
 	"io"
-
-	"github.com/go-logfmt/logfmt"
 
 	"github.com/TheEdgeOfRage/logfmt/config"
 )
 
 type Parser struct {
-	cfg    *config.Config
-	input  io.Reader
-	output io.Writer
+	cfg        *config.Config
+	input      io.Reader
+	output     io.Writer
+	bufferSize int
 }
 
 func NewParser(cfg *config.Config, input io.Reader, output io.Writer) *Parser {
-	if cfg.BufferSize == 0 {
-		cfg.BufferSize = 1048576
+	bufferSize := cfg.BufferSize
+	if bufferSize == 0 {
+		bufferSize = config.DefaultBufferSize
 	}
 	return &Parser{
-		cfg:    cfg,
-		input:  input,
-		output: output,
+		cfg:        cfg,
+		input:      input,
+		output:     output,
+		bufferSize: bufferSize,
 	}
 }
 
 // Start starts the parser, reading from the input stream and printing the log output to the output stream line by line
 func (p *Parser) Start() error {
-	decoder := logfmt.NewDecoderSize(p.input, p.cfg.BufferSize)
-	for decoder.ScanRecord() {
-		record, err := NewRecord(decoder, p.cfg)
+	scanner := bufio.NewScanner(p.input)
+	scanner.Buffer(make([]byte, 0, p.bufferSize), p.bufferSize)
+	for scanner.Scan() {
+		line := scanner.Text()
+		record, err := NewRecord(line, p.cfg, p.bufferSize)
 		if err != nil {
-			return err
+			if _, err := fmt.Fprintln(p.output, line); err != nil {
+				return fmt.Errorf("failed to print log to output: %w", err)
+			}
+			continue
 		}
 		if record.level < p.cfg.LogLevel {
 			continue
@@ -41,17 +47,12 @@ func (p *Parser) Start() error {
 		if len(p.cfg.Filter) > 0 && !record.MatchesFilter(p.cfg.Filter) {
 			continue
 		}
-		line := record.String(p.cfg)
-		if line != "" {
-			_, err = fmt.Fprintf(p.output, "%s\n", record.String(p.cfg))
-			if err != nil {
+		out := record.String(p.cfg)
+		if out != "" || p.cfg.KeepEmpty {
+			if _, err := fmt.Fprintln(p.output, out); err != nil {
 				return fmt.Errorf("failed to print log to output: %w", err)
 			}
 		}
 	}
-
-	if errors.Is(decoder.Err(), io.EOF) {
-		return nil
-	}
-	return decoder.Err()
+	return scanner.Err()
 }
