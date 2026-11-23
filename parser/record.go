@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/go-logfmt/logfmt"
 
 	"github.com/TheEdgeOfRage/logfmt/config"
@@ -15,19 +14,10 @@ import (
 
 var (
 	levelStrings    map[config.Level]string
-	levelColors     map[config.Level]*color.Color
 	timestampLabels = []string{"time", "timestamp", "datetime", "ts", "t"}
 )
 
 func init() {
-	levelColors = map[config.Level]*color.Color{
-		config.Trace:   color.New(color.FgBlack).Add(color.BgHiBlue).Add(color.Bold),
-		config.Debug:   color.New(color.FgBlack).Add(color.BgCyan).Add(color.Bold),
-		config.Info:    color.New(color.FgBlack).Add(color.BgGreen).Add(color.Bold),
-		config.Warning: color.New(color.FgBlack).Add(color.BgYellow).Add(color.Bold),
-		config.Error:   color.New(color.FgBlack).Add(color.BgRed).Add(color.Bold),
-		config.Fatal:   color.New(color.FgRed).Add(color.BgBlack).Add(color.Bold),
-	}
 	levelStrings = map[config.Level]string{
 		config.Trace:   "TRACE",
 		config.Debug:   "DEBUG",
@@ -107,21 +97,25 @@ func isNull(s string) bool {
 	return false
 }
 
-func getFormattedValue(value string) string {
+func getFormattedValue(value string, colors *config.Colors) string {
 	if isNumeric(value) || isBoolean(value) {
-		return color.MagentaString(value)
+		return colors.Numeric.Sprint(value)
 	}
 	if isNull(value) {
-		return color.YellowString(value)
+		return colors.Null.Sprint(value)
 	}
 	if strings.ContainsAny(value, " \"") {
 		value = "\"" + strings.ReplaceAll(value, "\"", "\\\"") + "\""
 	}
-	return color.HiGreenString(value)
+	return colors.String.Sprint(value)
 }
 
-func getFormattedLevel(level config.Level) string {
-	return levelColors[level].Sprintf("[%s]", levelStrings[level])
+const levelLabelWidth = len("[ERROR]")
+
+func getFormattedLevel(level config.Level, colors *config.Colors) string {
+	label := fmt.Sprintf("[%s]", levelStrings[level])
+	padding := strings.Repeat(" ", levelLabelWidth-len(label))
+	return padding + colors.Levels[level].Sprint(label)
 }
 
 func (r *Record) parseLevel(level string) {
@@ -181,11 +175,10 @@ func (r *Record) String(cfg *config.Config) string {
 		if !ok {
 			continue
 		}
-		key := color.HiBlueString(key)
 		if cfg.Raw {
-			line += fmt.Sprintf(" %s", value)
+			line += " " + value
 		} else {
-			line += fmt.Sprintf(" %s=%s", key, getFormattedValue(value))
+			line += " " + cfg.Colors.Key.Sprint(key) + cfg.Colors.Equal.Sprint("=") + getFormattedValue(value, &cfg.Colors)
 		}
 	}
 
@@ -202,19 +195,16 @@ func (r *Record) String(cfg *config.Config) string {
 		fmtString.WriteString("%s ")
 	}
 
-	if cfg.NoColor {
-		fmtString.WriteString("%7s%s")
-	} else {
-		fmtString.WriteString("%26s%s")
-	}
+	fmtString.WriteString("%s%s")
 
+	level := getFormattedLevel(r.level, &cfg.Colors)
 	if cfg.NoTime {
-		return fmt.Sprintf(fmtString.String(), getFormattedLevel(r.level), line)
+		return fmt.Sprintf(fmtString.String(), level, line)
 	}
 
 	ts := strings.Repeat(" ", 19)
 	if !r.time.IsZero() {
 		ts = r.time.Format("2006-01-02 15:04:05")
 	}
-	return fmt.Sprintf(fmtString.String(), ts, getFormattedLevel(r.level), line)
+	return fmt.Sprintf(fmtString.String(), cfg.Colors.Date.Sprint(ts), level, line)
 }

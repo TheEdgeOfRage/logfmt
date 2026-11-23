@@ -3,6 +3,7 @@ module github.com/TheEdgeOfRage/logfmt
 go 1.26.0
 
 require (
+	github.com/BurntSushi/toml v1.6.0
 	github.com/fatih/color v1.19.0
 	github.com/go-logfmt/logfmt v0.6.1
 	github.com/jessevdk/go-flags v1.6.1

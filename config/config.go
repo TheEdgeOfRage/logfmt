@@ -42,6 +42,8 @@ type Config struct {
 	All bool
 	// How long can a line be?
 	BufferSize int
+	// Colors are the output styles, customizable via the config file
+	Colors Colors
 }
 
 type rawConfig struct {
@@ -71,7 +73,13 @@ func Parse() (*Config, error) {
 		return nil, fmt.Errorf("cannot use both --exclude and --output")
 	}
 
+	colors, err := loadColors()
+	if err != nil {
+		return nil, err
+	}
+
 	cfg := Config{
+		Colors:        colors,
 		OutputFields:  parseFieldList(raw.OutputFields),
 		ExcludeFields: parseFieldList(raw.ExcludeFields),
 		BufferSize:    raw.BufferSize,

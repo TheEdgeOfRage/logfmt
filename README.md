@@ -108,3 +108,29 @@ Don't output keys just values (emulate lcut like behavior), also outputs timesta
 ### Output All
 
 Output all keys if flag is set and treat output option as an order which fields should be displayed first
+
+### Configure colors
+
+Colors can be set in `$XDG_CONFIG_HOME/logfmt/config.toml` (falls back to `~/.config/logfmt/config.toml`). Unset keys keep the defaults below.
+
+```toml
+# single value = foreground
+[color]
+equal = "normal"
+date = "normal"
+key = "brightblue"
+null = "yellow"
+numeric = "magenta"
+string = "brightgreen"
+
+# "foreground [background [style]]"; style is normal, bold, italic or underline
+[color.levels]
+trace = "black brightblue bold"
+debug = "black cyan bold"
+info = "black green bold"
+warning = "black yellow bold"
+error = "black red bold"
+fatal = "red black bold"
+```
+
+Colors are `normal` (terminal default), `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white` (optionally prefixed with `bright`), or a `#rrggbb` hex code.
