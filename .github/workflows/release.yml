@@ -57,6 +57,25 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate release notes
+      env:
+        CURRENT_TAG: ${{ github.ref_name }}
+      run: |
+        previous_tag=$(git describe --tags --abbrev=0 "$CURRENT_TAG^" 2>/dev/null || true)
+        if [ -n "$previous_tag" ]; then
+          commit_range="$previous_tag..$CURRENT_TAG"
+        else
+          commit_range="$CURRENT_TAG"
+        fi
+        {
+          echo "Automated release for tag $CURRENT_TAG."
+          echo
+          echo "## Commits"
+          git log --format='- %s (%h)' "$commit_range"
+        } > release-notes.md
 
     - name: Download all build artifacts
       uses: actions/download-artifact@v4
@@ -68,6 +87,5 @@ jobs:
       with:
         tag_name: ${{ github.ref_name }}
         name: "Release ${{ github.ref_name }}"
-        body: |
-          Automated release for tag ${{ github.ref_name }}.
+        body_path: release-notes.md
         files: release-artifacts/*/*
