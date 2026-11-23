@@ -97,7 +97,7 @@ If you don't want to have colors on the output, set `-n`.
 By default, logfmt will detect if the output is a pipe or redirect to a file and will automatically disable colors. If
 you still want to have colorized output, for example when piping into `less`, you can force it using `-c`.
 
-### Show empty lines 
+### Show empty lines
 
 By default, `logfmt` doesn't output lines when no fields are selected. To **change that behavior** and **show empty lines**, pass the `-k` flag.
 
@@ -108,7 +108,3 @@ Don't output keys just values (emulate lcut like behavior), also outputs timesta
 ### Output All
 
 Output all keys if flag is set and treat output option as an order which fields should be displayed first
-
-### Sponsors
-
-[<img src="https://api.gitsponsors.com/api/badge/img?id=762009335" height="20">](https://api.gitsponsors.com/api/badge/link?p=TiQmn6g+rUCXsoHQ8LFH5o8rqe9cxSSV1UZnSww4OkaDaJwHRhmTbYpBG0WBftpmMe5A5Aif6rgCVUEeEfnxWpK5ULZXvtMffXQpi9I2mYk6IbcR6o6oZiIYa/QEVs8yS1LL/QbJNNCpjnSXNbKSV5+dDMAZHmI5DRTAclaG4NI=)
